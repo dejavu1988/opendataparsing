@@ -39,15 +39,12 @@ def extract(data):
     recordlist = []
     for name in archive.namelist():
         print "Processing file: " + name
-        f = archive.open(name, 'rU')
-        tmpstr = f.readline()
-        while tmpstr:
+        f = archive.open(name, 'r')
+        linelist = f.readlines()
+        for tmpstr in linelist:
             if tmpstr[0] != '#':
                 entry = tmpstr[:-1].split('|')
-                if len(entry) != 9:
-                    print entry
                 recordlist.append(tuple(entry))
-            tmpstr = f.readline()
         f.close()
     archive.close()
     data.close()
@@ -68,44 +65,43 @@ def analyseMainCategory(recordlist):
     print "Analysing MainCategory-Frequency.."
     catedict = {}
     for entry in recordlist:
-        if len(entry) != 9:
-            print entry
-            continue
         cate = entry[5]
         if catedict.has_key(cate):
             catedict[cate] = catedict[cate] + 1
         else:
             catedict[cate] = 1
+    print "Done."
     return catedict
 
 def analyseLocation(recordlist):
     print "Analysing Location-Frequency.."
     locdict = {}
     for entry in recordlist:
-        if len(entry) != 9:
-            print entry
-            continue
         loc = entry[7]+entry[8]
         if locdict.has_key(loc):
             locdict[loc] = locdict[loc] + 1
         else:
             locdict[loc] = 1
+    print "Done."
     return locdict
 
 def output(resdict, path):
     f = open(path, 'w')
     for key in resdict.keys():
         entry = key+' '+str(resdict[key])+'\n'
-        print entry
         f.write(entry)
     f.close()
 
-if __name__ == "__main__":
+def main():
     remotePath = "http://pilvilinna.cert.fi/opendata/autoreporter/csv.zip"
     data = retrieve(remotePath)
     recordlist = extract(data)
-    dump(recordlist)
+    #dump(recordlist)
     catedict = analyseMainCategory(recordlist)
     locdict = analyseLocation(recordlist)
     output(catedict, 'category-frequency.csv')
     output(locdict, 'location-frequency.csv')
+
+
+if __name__ == "__main__":
+    main()
