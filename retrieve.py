@@ -38,6 +38,7 @@ def extract(data):
         sys.exit() 
     record = []
     for name in archive.namelist():
+        print "Processing file: " + name
         f = archive.open(name, 'rU')
         tmpstr = f.readline()
         while tmpstr:
@@ -45,15 +46,14 @@ def extract(data):
                 entry = tmpstr[:-1].split('|')
                 record.append(entry)
             tmpstr = f.readline()
-    print "Extracted to record list."
+        f.close()
+    archive.close()
+    data.close()
+    print "Extracted to record list: " + str(len(record)) + " entries."
     return record
 
 
 if __name__ == "__main__":
     remotePath = "http://pilvilinna.cert.fi/opendata/autoreporter/csv.zip"
-    #localPath = "csv.zip"
-    #localDir = "csv"
-    #clear(localPath, localDir)
     data = retrieve(remotePath)
     record = extract(data)
-    print len(record)
