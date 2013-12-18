@@ -75,13 +75,13 @@ def dump(recordlist):
     """ Dumping data structure to file for debugging
         @param recordlist: data structure (a list of tuples) to store merged records
     """
-    f = open('record.csv','w')
-    for entry in recordlist:
-        tmpstr = ''
-        for item in entry:
-            tmpstr += item + '|'
-        f.write(tmpstr[:-1]+'\n')
-    f.close()
+    with open('record.csv','w') as f:
+        for entry in recordlist:
+            tmpstr = ''
+            for item in entry:
+                tmpstr += item + '|'
+            f.write(tmpstr[:-1]+'\n')
+
     print "Record object dumped."
 
 def analyseMainCategory(recordlist):
@@ -121,11 +121,10 @@ def output(resdict, path):
         @param resdict: result data structure (dictionary)
         @param path: path of output csv file
     """
-    f = open(path, 'w')
-    for key in resdict.keys():
-        entry = key+' '+str(resdict[key])+'\n'
-        f.write(entry)
-    f.close()
+    with open(path, 'w') as f:
+        for key in resdict.keys():
+            entry = key+' '+str(resdict[key])+'\n'
+            f.write(entry)
 
 def main():
     """ Main function to execute
