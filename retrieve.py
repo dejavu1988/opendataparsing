@@ -52,21 +52,20 @@ def extract(data):
         @param data: file reference of zip (tmp)
         @return recordlist: data structure (a list of tuples) to store merged records, with each entry as a tuple
     """
-    archive = zipfile.ZipFile(data) # ZipFile object
-    if archive.testzip() != None:   # test zip validity
-        print "Invalid zipfile"
-        sys.exit() 
-    recordlist = []
-    for name in archive.namelist(): # get list of csvs in archive
-        print "Processing file: " + name
-        f = archive.open(name, 'r')
-        linelist = f.readlines()    # for each csv, get lines
-        for tmpstr in linelist:
-            if tmpstr[0] != '#':    # in case of valid entry
-                entry = tmpstr[:-1].split('|')
-                recordlist.append(tuple(entry)) # store tuple of entry into data structure
-        f.close()
-    archive.close()
+    with zipfile.ZipFile(data) as archive: # ZipFile object
+        if archive.testzip() != None:   # test zip validity
+            print "Invalid zipfile"
+            sys.exit() 
+        recordlist = []
+        for name in archive.namelist(): # get list of csvs in archive
+            print "Processing file: " + name
+            with archive.open(name, 'r') as f:
+                linelist = f.readlines()    # for each csv, get lines
+                for tmpstr in linelist:
+                    if tmpstr[0] != '#':    # in case of valid entry
+                        entry = tmpstr[:-1].split('|')
+                        recordlist.append(tuple(entry)) # store tuple of entry into data structure
+
     data.close()    # on close of tmp file reference, tmp file be automatically cleared
     print "Extracted to record list: " + str(len(recordlist)) + " entries."
     return recordlist
